@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     sudo
 
 RUN pip3 install --upgrade pip
-#COPY requirements.txt /requirements.txt
-#RUN pip3 install -r /requirements.txt
+COPY requirements.txt /requirements.txt
+RUN pip3 install -r /requirements.txt
 
 RUN wget https://julialang-s3.julialang.org/bin/linux/x64/1.0/julia-1.0.2-linux-x86_64.tar.gz && \
 tar xzvf julia-1.0.2-linux-x86_64.tar.gz -C /opt
@@ -40,11 +40,14 @@ workdir /work
 ENV HOME /home/ubuntu
 ENV LANG en_US.UTF-8
 ENV LC_ALL="C"
+ENV PATH=$PATH:/opt/julia-1.0.2/bin
 
 # Set alias for python3.5
 RUN echo "alias python=python3" >> $HOME/.bashrc && \
     echo "alias pip=pip3" >> $HOME/.bashrc
 
+RUN julia -e 'Pkg.update()' && \
+  julia -e 'using Pkg; Pkg.add("IJulia")'
 
 # start jupyter notebook
 expose 8888
